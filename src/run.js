@@ -1,18 +1,16 @@
 'use strict';
 
-const homeWorld = 'Sea of Sorrows';
-const defaultGroup = 'Verified';
-
-const linkedWorlds = [
-  "Devona's Rest"
-];
-
-const linkedGroup = 'Linked';
-
 const Client = require('node-rest-client').Client;
 const Bot = require('cmr1-ts3-bot');
 const async = require('async');
 const msgs = require('./msgs');
+
+const defaultGroup = 'Normal';
+
+const homeWorld = process.env.GW2_HOME_WORLD || null;
+const homeGroup = process.env.GW2_HOME_GROUP || defaultGroup;
+const linkedWorlds = process.env.GW2_LINKED_WORLDS ? process.env.GW2_LINKED_WORLDS.split(',') : [];
+const linkedGroup = process.env.GW2_LINKED_GROUP || defaultGroup;
 
 const api = new Client();
 
@@ -111,18 +109,26 @@ bot.privateCommand('apikey', (args, context) => {
           context.client.message(`I'm sorry, I have encountered an error: ${err}`);         
         } else if (groups && groups.length > 0) {
           context.client.message(`You are a member of the group(s): ${groups}`);
-        } else if (resp.world.name === homeWorld) {
-          context.client.addToServerGroup(defaultGroup, err => {
-            if (err) bot.logger.warn(err);
-            else context.client.message(`You have been added to the group: ${defaultGroup}`);
-          });
-        } else if (linkedWorlds.indexOf(resp.world.name) !== -1) {
-          context.client.addToServerGroup(linkedGroup, err => {
-            if (err) bot.logger.warn(err);
-            else context.client.message(`You have been added to the group: ${linkedGroup}`);
-          });
         } else {
-          context.client.message(`I'm sorry, but automatic verification is not currently enabled for ${resp.world.name}.`);
+          let addGroup = null;
+
+          if (!homeWorld || homeWorld === 'none' || homeWorld.trim() === '') {
+            addGroup = defaultGroup;
+          } else if (resp.world.name === homeWorld) {
+            addGroup = homeGroup;
+          } else if (linkedWorlds.indexOf(resp.world.name) !== -1) {
+            addGroup = linkedGroup;
+          } else {
+            context.client.message(`I'm sorry, but automatic verification is not currently enabled for ${resp.world.name}.`);
+            return;
+          }
+
+          if (addGroup) {
+            context.client.addToServerGroup(addGroup, err => {
+              if (err) bot.logger.warn(err);
+              else context.client.message(`You have been added to the group: ${addGroup}`);
+            });
+          }
         }
       });
     }
