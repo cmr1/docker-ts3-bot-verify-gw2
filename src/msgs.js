@@ -25,5 +25,9 @@ Welcome! You may begin the verification process by typing the following: (in thi
 `;
 
 module.exports.hint = `
+You may begin the verification process by typing the following: (to me directly OR in this channel)
+
+[b]verifyme[/b]
+
 You may also type '[b]woodhouse[/b]' or '[b]help[/b]' anytime for help.
 `;

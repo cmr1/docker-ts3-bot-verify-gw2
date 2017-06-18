@@ -1,9 +1,9 @@
 'use strict';
 
-const Client = require('node-rest-client').Client;
 const Bot = require('cmr1-ts3-bot');
 const async = require('async');
 const msgs = require('./msgs');
+const gw2 = require('./gw2');
 
 const defaultGroup = 'Normal';
 
@@ -12,66 +12,33 @@ const homeGroup = process.env.GW2_HOME_GROUP || defaultGroup;
 const linkedWorlds = process.env.GW2_LINKED_WORLDS ? process.env.GW2_LINKED_WORLDS.split(',') : [];
 const linkedGroup = process.env.GW2_LINKED_GROUP || defaultGroup;
 
-const api = new Client();
-
-const base = 'https://api.guildwars2.com/v2';
-
-api.registerMethod('getWorlds', base + '/worlds', 'GET');
-api.registerMethod('getAccount', base + '/account', 'GET');
-api.registerMethod('getGuild', base + '/guild/${id}', 'GET');
-
-function lookupGw2Info(apiKey, callback) {
-  const apiArgs = {
-    headers: {
-      Authorization: 'Bearer ' + apiKey
-    }
-  };
-
-  const response = {};
-
-  api.methods.getAccount(apiArgs, (data, resp) => {
-    if (!data.id || !data.world) {
-      return callback('Invalid Account/ApiKey');
-    }
-
-    response.account = data;
-
-    api.methods.getWorlds({ parameters: { ids: data.world }}, (data, resp) => {
-      if (data.length === 0 || !data[0].id || !data[0].name) {
-        return callback('Invalid World');
-      }
-
-      response.world = data[0];
-      response.guilds = [];
-
-      async.each(response.account.guilds, (id, next) => {
-        api.methods.getGuild({ path: { id }}, (data, resp) => {
-          response.guilds.push(data);
-
-          next();
-        });
-      }, err => {
-        return callback(err, response);
-      });
-    });
-  });
-}
-
 const bot = new Bot();
 
 bot.init();
 
 bot.on('ready', () => {
-  bot.server.message(`Ready for service.`);
+  // bot.server.message(`Ready for service.`);
 });
 
 bot.on('join', channel => {
-  channel.message(msgs.welcome + msgs.hint);
+  channel.message(`Ready for service.`);
+  // channel.message(msgs.welcome + msgs.hint);
 });
 
 bot.on('cliententerchannel', context => {
-  context.channel.message(msgs.welcome + msgs.hint);
-  context.client.message(`Hi ${context.client.client_nickname}! My name is ${bot.options.name}, I can help verify your GuildWars2 account information and automatically add you to the appropriate TeamSpeak group(s)!\n${msgs.hint}`);
+  context.channel.message(`Hi ${context.client.client_nickname}! My name is ${bot.options.name}, I can help verify your GuildWars2 account information and automatically add you to the appropriate TeamSpeak group(s)!\n${msgs.hint}`);  
+});
+
+bot.on('cliententerview', (context) => {
+  context.client.getServerGroups((err, groups) => {
+    if (err) {
+      bot.logger.warn('Unable to get server groups for client!', err, context);
+    
+    // New user is a guest
+    } else if (groups.length === 1 && groups[0].sgid === 8) {
+      context.client.message(`Hi ${context.client.client_nickname}! My name is ${bot.options.name}, I can help verify your GuildWars2 account information and automatically add you to the appropriate TeamSpeak group(s)!\n${msgs.hint}`);  
+    }
+  });
 });
 
 bot.globalCommand('help', (args, context) => {
@@ -89,7 +56,7 @@ bot.globalCommand('verifyme', (args, context) => {
 bot.privateCommand('apikey', (args, context) => {
   context.client.message('Thanks! Let me look up your account information...');
 
-  lookupGw2Info(args[1], (err, resp) => {
+  gw2.lookup(args[1], (err, resp) => {
     if (err) {
       context.client.message(`I'm sorry, I have encountered an error: ${err}`);
     } else {
@@ -125,8 +92,13 @@ bot.privateCommand('apikey', (args, context) => {
 
           if (addGroup) {
             context.client.addToServerGroup(addGroup, err => {
-              if (err) bot.logger.warn(err);
-              else context.client.message(`You have been added to the group: ${addGroup}`);
+              if (err) {
+                bot.logger.warn(err);
+                context.client.message(`I'm sorry, I have encountered an error: ${err.message || 'Unknown'}`);
+                context.client.message(`It appears your API KEY is valid, but I am unable to add you to the correct TS group(s)! Please contact an admin for further assistance.`);
+              } else {
+                context.client.message(`You have been added to the group: ${addGroup}`);
+              }
             });
           }
         }
