@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "async": "^2.4.1",
-    "cmr1-ts3-bot": "0.0.4",
+    "cmr1-ts3-bot": "0.0.5",
     "node-rest-client": "^3.1.0"
   }
 }
