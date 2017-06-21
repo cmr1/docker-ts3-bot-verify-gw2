@@ -6,4 +6,4 @@ services:
     volumes:
       - ./src:/bot
     env_file:
-      - .env
+      - .env.example

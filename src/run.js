@@ -26,19 +26,24 @@ bot.on('join', channel => {
 });
 
 bot.on('cliententerchannel', context => {
-  context.channel.message(`Hi ${context.client.client_nickname}! My name is ${bot.options.name}, I can help verify your GuildWars2 account information and automatically add you to the appropriate TeamSpeak group(s)!\n${msgs.hint}`);  
+  context.channel.message(msgs.hint);
+  context.client.message(`Hi ${context.client.client_nickname}! My name is ${bot.options.name}, I can help verify your GuildWars2 account information and automatically add you to the appropriate TeamSpeak group(s)!\n${msgs.hint}`);  
 });
 
-bot.on('cliententerview', (context) => {
-  context.client.getServerGroups((err, groups) => {
-    if (err) {
-      bot.logger.warn('Unable to get server groups for client!', err, context);
+// bot.on('cliententerview', (context) => {
+//   context.client.getServerGroups((err, groups) => {
+//     if (err) {
+//       bot.logger.warn('Unable to get server groups for client!', err, context);
     
-    // New user is a guest
-    } else if (groups.length === 1 && groups[0].sgid === 8) {
-      context.client.message(`Hi ${context.client.client_nickname}! My name is ${bot.options.name}, I can help verify your GuildWars2 account information and automatically add you to the appropriate TeamSpeak group(s)!\n${msgs.hint}`);  
-    }
-  });
+//     // New user is a guest
+//     } else if (groups.length === 1 && groups[0].sgid === 8) {
+//       context.client.message(`Hi ${context.client.client_nickname}! My name is ${bot.options.name}, I can help verify your GuildWars2 account information and automatically add you to the appropriate TeamSpeak group(s)!\n${msgs.hint}`);  
+//     }
+//   });
+// });
+
+bot.on('unknowncommand', context => {
+  context.client.message(`Sorry, I don't know how to process that request. Please try again.\n${msgs.hint}`);
 });
 
 bot.globalCommand('help', (args, context) => {
@@ -53,7 +58,7 @@ bot.globalCommand('verifyme', (args, context) => {
   context.client.message(msgs.help);
 });
 
-bot.privateCommand('apikey', (args, context) => {
+bot.clientCommand('apikey', (args, context) => {
   context.client.message('Thanks! Let me look up your account information...');
 
   gw2.lookup(args[1], (err, resp) => {
