@@ -8,10 +8,10 @@ RUN mkdir -p $BOT_DIR
 
 WORKDIR $BOT_DIR
 
-COPY ./src/package.json .
+COPY ./package.json .
 
 RUN npm install
 
-COPY ./src/ ./
+COPY . .
 
 CMD [ "npm", "start" ]

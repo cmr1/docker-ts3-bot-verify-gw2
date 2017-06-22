@@ -1,0 +1,25 @@
+{
+  "name": "src",
+  "version": "1.0.0",
+  "description": "",
+  "main": "gw2-verify-msgs.js",
+  "scripts": {
+    "lint": "eslint ./src",
+    "lint-fix": "eslint ./src --fix",
+    "pretest": "npm run lint",
+    "test": "mocha test/**/*.spec.js",
+    "start": "node src/run.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.4.1",
+    "cmr1-ts3-bot": "0.1.0",
+    "node-rest-client": "^3.1.0"
+  },
+  "devDependencies": {
+    "chai": "^4.0.2",
+    "eslint": "^4.0.0",
+    "mocha": "^3.4.2"
+  }
+}
