@@ -2,16 +2,6 @@ FROM node:6-slim
 
 LABEL maintainer "Charlie McClung <charlie.mcclung@autodesk.com>"
 
-ENV BOT_DIR=/bot
+RUN npm install --global cmr1-ts3-bot-verify-gw2
 
-RUN mkdir -p $BOT_DIR
-
-WORKDIR $BOT_DIR
-
-COPY ./package.json .
-
-RUN npm install
-
-COPY . .
-
-CMD [ "npm", "start" ]
+ENTRYPOINT [ "ts3-bot-verify-gw2" ]
