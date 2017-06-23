@@ -1,15 +1,15 @@
 sudo: required
-language: node_js
-node_js: 6
-# services:
-# - docker
-# before_install:
-# - mkdir -p /tmp/ts3
-# - cp -r ts3/* /tmp/ts3/
-# - sudo chown -R 503:503 /tmp/ts3
-# - docker-compose -f docker-compose.travis.yml up -d
-# - docker-compose -f docker-compose.travis.yml ps
-# - docker-compose -f docker-compose.travis.yml logs
+language: ruby
+services:
+- docker
+install:
+- mkdir -p /tmp/ts3
+- cp -r ts3/* /tmp/ts3/
+- sudo chown -R 503:503 /tmp/ts3
+script:
+- docker-compose -f docker-compose.travis.yml up -d
+- docker-compose -f docker-compose.travis.yml ps
+- docker-compose -f docker-compose.travis.yml logs
 notifications:
   slack:
     secure: SIkAGC9zcCLG23H0Q1Jl3iNRtEc2UNYaQEfnBh9Yrwi4uYaflOo6ryyJ8o+8t2T8PGEJGJ5o+Oa043bAnVT57u2P7FizXMylbFO4qWfhsfxgb3pavw60+7hc6HkwKIjyi3f2hHQmZr2WJp+fVO6lLDm1HkxDro8ZJALaRFdnrPCp/akANSSyuE486p2OUE8gM5H9fHGQ8txVNdTsaujM8Aym5EYvTZm6O6BYaunBs3/PxcJYqjHONOKw0emSEyw3O3cr+nstOZoJB2I8ZDacXcm/o4b69tJnAkl9ul4FipsdtqIDpFndcdqTCDUcKSULZ0tI6lI9XjrLfT3v2MiiL3dM1QkqZCM1XJ51VNBlAiWjBgGqRZkJFN9+0C9Am2sm5kxsdUBmOxGHrjC0RG8i7RtwUcET3YxZmtlyL0f0jL8n2MRwsifiReSfjusGX0k4O7VmHlRxGH7VFTlNugqwQtj/gYJkB7fk53wY4j7BSFuncP+GNUXYhctfPG77fhkeQ/NY1hZ695VioAiQqkeabMABvtB6Qans0++pSlIlOuUsF+sq9vVmX7EV+erS11UPLgA89XqWIlea5fSZ9TgpeR95BxSDZlPP6k85fMQgKDiKHgMeYarUlI0cXGkQUtgEJYcaybI/LytIr9yuqduzHaZeSJIHSyn6RXC0zMXzXZo=

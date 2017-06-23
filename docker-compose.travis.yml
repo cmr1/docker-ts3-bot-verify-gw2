@@ -8,3 +8,8 @@ services:
       - '10011:10011'
     volumes:
       - /tmp/ts3:/data
+
+  bot:
+    build: .
+    env_file:
+      - .env.example
